@@ -1,60 +1,213 @@
-Hotspot Detection in a Tubular Reactor using PINNs
+# 🔥 Hotspot Detection in a Tubular Reactor using Physics-Informed Neural Networks (PINNs)
 
-This repository contains my third-year project on detecting a temperature hotspot in a 1D tubular reactor using a Physics-Informed Neural Network (PINN), which i did in my Introduction to AI class.
-The aim of the project is to reconstruct the temperature profile inside the reactor using limited temperature sensor data while enforcing the governing energy balance equation.
+## Overview
 
-Problem Description
+This project was developed as part of my **Introduction to AI** course during my third year of Chemical Engineering. It demonstrates the application of **Physics-Informed Neural Networks (PINNs)** for estimating the temperature distribution and detecting hotspot locations in a one-dimensional tubular reactor.
 
-In tubular reactors carrying exothermic reactions, localized high-temperature regions (hotspots) can form.
-Direct placement of sensors inside the hotspot region is often unsafe, so temperature measurements are usually sparse and taken away from the hotspot.
-The objective of this project is to:
-Reconstruct the full temperature field along the reactor length
-Identify the hotspot location
-Use physical laws to regularize the learning process when data is limited
+Unlike conventional neural networks, PINNs incorporate the governing physical laws directly into the training process, enabling accurate predictions even when only limited sensor measurements are available.
 
-Governing Equation
+---
 
-The steady-state one-dimensional energy balance is considered:
-u dT/dz = (k / ρCp) d²T/dz² + (−ΔHr / ρCp) rA(z)
+## Problem Statement
 
-The reaction heat source is modeled as a Gaussian function to represent a localized hotspot.
-Boundary conditions used are:
-Fixed inlet temperature (Dirichlet condition)
-Zero temperature gradient at the outlet (Neumann condition)
+Packed-bed and tubular reactors carrying exothermic reactions often develop localized **temperature hotspots**. These hotspots are critical because they can:
 
-Data Generation
+- Cause catalyst deactivation
+- Reduce reactor efficiency
+- Lead to thermal runaway
+- Increase operational safety risks
 
-A boundary value problem (BVP) corresponding to the energy equation is solved using SciPy’s solve_bvp function.
-This provides a physics-consistent temperature profile along the reactor length.
-From this solution:
-A small number of temperature sensors are selected
-Sensors are placed outside the hotspot region
-Gaussian noise is added to simulate realistic measurements
+Since placing sensors directly inside the hotspot region is often impractical or unsafe, only sparse temperature measurements are typically available.
 
-PINN Architecture
+The objective of this project is to reconstruct the complete temperature profile using limited sensor data while enforcing the reactor's governing energy balance equation through a Physics-Informed Neural Network.
 
-The Physics-Informed Neural Network is implemented using TensorFlow.
-Fully connected feedforward neural network
-3 hidden layers
-64 neurons per hidden layer
-tanh activation function
-Input: axial position (z)
-Output: temperature T(z)
-Automatic differentiation is used to compute spatial derivatives required for the PDE residual.
+---
 
-Training Methodology
+## Governing Equation
 
-The network is trained by minimizing a weighted loss function consisting of:
-Data loss from sensor measurements
-PDE residual loss enforcing the energy balance
-Boundary condition losses at inlet and outlet
-The Adam optimizer is used for training.
-Collocation points are sampled throughout the domain to enforce the governing equation.
+The reactor is modeled using the steady-state one-dimensional energy balance equation:
 
-Results
+\[
+u \frac{dT}{dz}=\frac{k}{\rho C_p}\frac{d^2T}{dz^2}+\frac{-\Delta H_r}{\rho C_p}r_A(z)\]
 
-The trained PINN is able to:
-Reconstruct the temperature distribution along the reactor
-Satisfy the governing physics and boundary conditions
-Estimate the hotspot location from the reconstructed temperature field
-The accuracy of hotspot detection depends on sensor placement, noise level, and parameter scaling.
+where the reaction heat source is represented by a **Gaussian function** to simulate a localized hotspot.
+
+### Assumptions
+
+- One-dimensional axial model
+- Plug flow reactor
+- Steady-state operation
+- Negligible radial temperature gradients
+- Constant thermophysical properties
+
+### Boundary Conditions
+
+- Fixed inlet temperature (Dirichlet condition)
+- Zero temperature gradient at the outlet (Neumann condition)
+
+---
+
+## Project Objectives
+
+- Model the reactor temperature profile
+- Generate physics-consistent synthetic data
+- Train a Physics-Informed Neural Network
+- Reconstruct the complete temperature distribution
+- Predict hotspot location using sparse sensor measurements
+- Compare PINN predictions with numerical solutions
+
+---
+
+## Data Generation
+
+The governing boundary value problem (BVP) is solved using **SciPy's `solve_bvp()`** to obtain the reference temperature profile.
+
+The generated data is then processed by:
+
+- Selecting sparse temperature sensor locations
+- Excluding sensors from the hotspot region
+- Adding Gaussian noise to simulate real experimental measurements
+- Creating collocation points for enforcing the governing PDE
+
+---
+
+## PINN Architecture
+
+The model is implemented using **TensorFlow**.
+
+**Network Configuration**
+
+- Fully Connected Feedforward Neural Network
+- 3 Hidden Layers
+- 64 Neurons per Hidden Layer
+- **tanh** Activation Function
+
+**Input**
+
+- Axial position (z)
+
+**Output**
+
+- Temperature T(z)
+
+Automatic differentiation is used to compute spatial derivatives required for evaluating the PDE residual.
+
+---
+
+## Training Methodology
+
+The PINN is trained by minimizing a weighted loss function consisting of:
+
+- Data Loss (sensor measurements)
+- PDE Residual Loss (energy balance equation)
+- Boundary Condition Loss (Dirichlet & Neumann conditions)
+
+The network is optimized using the **Adam Optimizer**, while collocation points sampled throughout the reactor ensure that the governing physics are satisfied.
+
+---
+
+## Technologies Used
+
+- Python
+- TensorFlow
+- SciPy
+- NumPy
+- Matplotlib
+- Jupyter Notebook
+
+---
+
+## Results
+
+The trained PINN successfully:
+
+- Reconstructed the reactor temperature profile
+- Learned the governing physical behavior from sparse data
+- Satisfied the PDE and boundary conditions
+- Predicted the hotspot location with good accuracy
+- Demonstrated the effectiveness of Scientific Machine Learning for inverse engineering problems
+
+The accuracy of hotspot prediction depends on factors such as sensor placement, measurement noise, and model parameter scaling.
+
+---
+
+## Project Structure
+
+```text
+PINN-Hotspot-Detection/
+│
+├── PINN_GROUP17_CODE_FINAL.ipynb
+├── Presentation.pptx
+├── Report.pdf
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## How to Run
+
+1. Clone the repository
+
+```bash
+git clone <repository-url>
+```
+
+2. Install the required dependencies
+
+```bash
+pip install tensorflow scipy numpy matplotlib
+```
+
+3. Launch Jupyter Notebook
+
+```bash
+jupyter notebook
+```
+
+4. Open `PINN_GROUP17_CODE_FINAL.ipynb`
+
+5. Run all cells to:
+
+- Solve the governing BVP
+- Generate synthetic sensor data
+- Train the PINN
+- Predict the reactor temperature profile
+- Detect the hotspot location
+- Visualize the results
+
+---
+
+## Skills Demonstrated
+
+- Physics-Informed Neural Networks (PINNs)
+- Scientific Machine Learning (SciML)
+- Deep Learning
+- TensorFlow
+- Numerical Methods
+- Differential Equations
+- Heat Transfer
+- Chemical Reaction Engineering
+- Scientific Computing
+- Python Programming
+
+---
+
+## Future Improvements
+
+- Extend the model to two-dimensional reactors
+- Incorporate transient (time-dependent) heat transfer
+- Use real experimental temperature data
+- Simultaneously predict concentration and temperature fields
+- Compare PINN performance with finite element and finite difference methods
+- Optimize sensor placement for improved hotspot detection
+
+---
+
+## Author
+
+**Badal Sakharkar**
+
+Chemical Engineering Undergraduate, VNIT Nagpur
+
+Interested in **AI for Engineering, Scientific Machine Learning, Data Analytics, and Process Modeling.**
